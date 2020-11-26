@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-die "\nGiven a comma separated .csv file the script will take the the column given in input and transform it into the reverse complement.\n\nUsage: rev_comp_column.pl <input> <column> <output>\n\n" unless @ARGV == 3;
+die "\nGiven a comma separated .csv file the script will take the the column given in input and transform it into the reverse complement.\n\nUsage: rev_comp_column.pl <input> <column> <flowcell ID> <output>\n\n" unless @ARGV == 4;
 
-my ($input, $selected_column, $output) = @ARGV;
+my ($input, $selected_column, $flowcell, $output) = @ARGV;
 
 my $counter = 0;
 my @read_rows = ();
@@ -19,8 +19,12 @@ while (my $line = <$IN>) {
 		my $new_line = concatenate_row(\@columns);
 		print $OUT $new_line;
 	}
-	else {
-		print $OUT $line;
+	elsif ($counter == 0) {
+		print $OUT "[Data]\n";
+		$counter++;
+	}
+	elsif ($counter == 1) {
+		print $OUT "FCID,Lane,SampleID,SampleRef,index,index2,SampleName,Control,Recipe,Operator,Project\n";
 		$counter++;
 	}
 }
@@ -38,7 +42,7 @@ sub rev_comp {
 sub concatenate_row {
 	my $row_ref = shift;
 	my @row_as_array = @$row_ref;
-	my $concatenated_row = $row_as_array[0];
+	my $concatenated_row = $flowcell;
 	for (my $i = 1; $i < scalar(@row_as_array); $i++) {
 		$concatenated_row = $concatenated_row . "," . $row_as_array[$i];
 	}
